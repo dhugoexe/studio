@@ -103,6 +103,71 @@ export const NativeActionImplementationInfoPropertyUI = observer(
             );
             build.indent();
             build.line(`// TODO: Implement action ${actionName} here`);
+
+            // Tips for user actions properties implementation
+            if (action.userProperties.length > 0) {
+                for (let i = 0; i < action.userProperties.length; i++) {
+                    const prop = action.userProperties[i];
+                    const propConstName = `ACTION_${getName("", action.name, NamingConvention.UnderscoreUpperCase)}_PROPERTY_${getName("", prop.name, NamingConvention.UnderscoreUpperCase)}`;
+                    const varName = getName("", prop.name, NamingConvention.UnderscoreLowerCase);
+
+                    let cType, getterFunction;
+                    switch(prop.type) {
+                        case 'boolean':
+                            cType = 'bool';
+                            getterFunction = 'get_user_property_bool';
+                            break;
+                        case 'string':
+                            cType = 'const char *';
+                            getterFunction = 'get_user_property_str';
+                            break;
+                        case 'integer':
+                            cType = 'int';
+                            getterFunction = 'get_user_property_int';
+                            break;
+                        case 'float':
+                            cType = 'float';
+                            getterFunction = 'get_user_property_float';
+                            break;
+                        default:
+                            cType = 'void *';
+                            getterFunction = 'get_user_property';
+                    }
+
+                    build.line(`${cType} ${varName} = ${getterFunction}(${propConstName});`);
+                }
+
+                build.line('');
+
+                const actionVarName = getName("", action.name, NamingConvention.UnderscoreLowerCase);
+                for (let i = 0; i < action.userProperties.length; i++) {
+                    const prop = action.userProperties[i];
+                    const propConstName = `ACTION_${getName("", action.name, NamingConvention.UnderscoreUpperCase)}_PROPERTY_${getName("", prop.name, NamingConvention.UnderscoreUpperCase)}`;
+                    const propVarName = getName("", prop.name, NamingConvention.UnderscoreLowerCase);
+
+                    let setterFunction;
+                    switch(prop.type) {
+                        case 'boolean':
+                            setterFunction = 'set_user_property_bool';
+                            break;
+                        case 'string':
+                            setterFunction = 'set_user_property_str';
+                            break;
+                        case 'integer':
+                            setterFunction = 'set_user_property_int';
+                            break;
+                        case 'float':
+                            setterFunction = 'set_user_property_float';
+                            break;
+                        default:
+                            setterFunction = 'set_user_property';
+                    }
+
+                    build.line(`${setterFunction}(${propConstName}, ${actionVarName}.${propVarName});`);
+                }
+            }
+
+
             build.unindent();
             build.line(`}`);
 
