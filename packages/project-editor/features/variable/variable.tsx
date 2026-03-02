@@ -1626,6 +1626,16 @@ export class ProjectVariables extends EezObject {
         }
 
         const projectStore = ProjectEditor.getProjectStore(this);
+        const project = projectStore.project;
+        for (const importDirective of project.settings.general.imports) {
+            if (importDirective.project && importDirective.project.variables) {
+                for (const enumDef of importDirective.project.variables.enums) {
+                    if (!map.has(enumDef.name)) {
+                        map.set(enumDef.name, enumDef);
+                    }
+                }
+            }
+        }
         const systemEnums = getSystemEnums(projectStore);
         for (const enumDef of systemEnums) {
             map.set(enumDef.name, enumDef);

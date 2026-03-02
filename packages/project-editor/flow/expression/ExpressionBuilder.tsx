@@ -765,6 +765,26 @@ const SelectItemDialog = observer(
                     expanded: true
                 });
             }
+            const pages = this.context.project._assets.pages;
+            if (pages.length > 0) {
+                children.push({
+                    id: "pages",
+                    label: "Pages",
+                    children: pages.map(page => {
+                        const data = `"${page.page.name}"`;
+                        return {
+                            id: page.name,
+                            label: page.name,
+                            children: [],
+                            selected: this.selection == data,
+                            expanded: false,
+                            data: data
+                        };
+                    }),
+                    selected: false,
+                    expanded: true
+                });
+            }
 
             return observable({
                 nonEmpty: children.length > 0,
@@ -814,7 +834,7 @@ const SelectItemDialog = observer(
                 });
 
                 const enumTypes = [
-                    ...this.context.project.variables.enums,
+                    ...this.context.project.allEnums,
                     ...getSystemEnums(this.context)
                 ];
 

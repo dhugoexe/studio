@@ -1040,7 +1040,7 @@ export function buildFlowStructValues(assets: Assets) {
 export function buildFlowEnums(assets: Assets) {
     const defs: string[] = [];
 
-    for (const enumObject of assets.projectStore.project.variables.enums) {
+    for (const enumObject of assets.projectStore.project.allEnums) {
         const enumItems: string[] = [];
 
         for (const item of enumObject.members) {

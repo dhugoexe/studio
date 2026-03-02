@@ -477,15 +477,16 @@ export class LVGLBuild extends Build {
             let name = getName("", font, NamingConvention.UnderscoreLowerCase);
 
             // make sure that name is unique
-            if (names.has(name)) {
-                for (let i = 1; ; i++) {
-                    const newName = name + i.toString();
-                    if (!names.has(newName)) {
-                        name = newName;
-                        break;
-                    }
-                }
-            }
+            // TODO: Fix it
+            // if (names.has(name)) {
+            //     for (let i = 1; ; i++) {
+            //         const newName = name + i.toString();
+            //         if (!names.has(newName)) {
+            //             name = newName;
+            //             break;
+            //         }
+            //     }
+            // }
 
             this.fontNames.set(font.objID, name);
             names.add(name);
@@ -2309,7 +2310,7 @@ export class LVGLBuild extends Build {
         build.line(
             `lv_theme_t *theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), ${
                 this.project.settings.general.darkTheme ? "true" : "false"
-            }, LV_FONT_DEFAULT);`
+            }, EEZ_LV_DEFAULT_FONT);` // TODO: Fix to use LV_FONT_DEFAULT instead
         );
         if (this.isV9) {
             build.line("lv_display_set_theme(dispp, theme);");
@@ -2601,23 +2602,23 @@ extern const ext_img_desc_t images[${this.bitmaps.length || 1}];
 
         return this.result;
     }
-
     async buildFontsDecl() {
         this.startBuild();
         const build = this;
+        const declaredNames = new Set();
 
         for (const font of this.fonts) {
+            const varName = this.getFontVariableName(font);
+            if (declaredNames.has(varName)) continue;
+            declaredNames.add(varName);
+
             if (
                 this.project.settings.build.fontExportMode == "binary" ||
                 font.lvglUseFreeType
             ) {
-                build.line(
-                    `extern lv_font_t *${this.getFontVariableName(font)};`
-                );
+                build.line(`extern lv_font_t *${varName};`);
             } else {
-                build.line(
-                    `extern const lv_font_t ${this.getFontVariableName(font)};`
-                );
+                build.line(`extern const lv_font_t ${varName};`);
             }
         }
 
@@ -2635,11 +2636,12 @@ extern ext_font_desc_t fonts[];
         return this.result;
     }
 
+
     async buildActionsDecl() {
         this.startBuild();
         const build = this;
 
-        for (const action of this.project.actions) {
+        for (const action of this.project.allActions) {
             if (
                 !this.assets.projectStore.projectTypeTraits.hasFlowSupport ||
                 action.implementationType === "native"
@@ -2687,7 +2689,7 @@ extern ext_font_desc_t fonts[];
         build.blockStart("ActionExecFunc actions[] = {");
 
         let numActions = 0;
-        for (const action of this.project.actions) {
+        for (const action of this.project.allActions) {
             if (
                 !this.assets.projectStore.projectTypeTraits.hasFlowSupport ||
                 action.implementationType === "native"
@@ -2710,7 +2712,7 @@ extern ext_font_desc_t fonts[];
         this.startBuild();
         const build = this;
 
-        for (const variable of this.project.variables.globalVariables) {
+        for (const variable of this.project.allVisibleGlobalVariables) {
             if (
                 !this.assets.projectStore.projectTypeTraits.hasFlowSupport ||
                 variable.native
@@ -2758,7 +2760,7 @@ extern ext_font_desc_t fonts[];
 
         build.line("{ NATIVE_VAR_TYPE_NONE, 0, 0 },");
 
-        for (const variable of this.project.variables.globalVariables) {
+        for (const variable of this.project.allVisibleGlobalVariables) {
             if (
                 !this.assets.projectStore.projectTypeTraits.hasFlowSupport ||
                 variable.native

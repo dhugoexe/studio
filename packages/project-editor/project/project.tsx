@@ -1771,6 +1771,7 @@ export class Project extends EezObject {
             masterProject: computed({ keepAlive: true }),
             allGlobalVariables: computed({ keepAlive: true }),
             allVisibleGlobalVariables: computed({ keepAlive: true }),
+            allEnums: computed({ keepAlive: true }),
             importAsList: computed({ keepAlive: true }),
             colorToIndexMap: computed,
             buildColors: computed({ keepAlive: true }),
@@ -1893,6 +1894,16 @@ export class Project extends EezObject {
         return allVariables;
     }
 
+    get allEnums() {
+        let allEnums = this.variables ? [...this.variables.enums] : [];
+        for (const importDirective of this.settings.general.imports) {
+            if (importDirective.project && importDirective.project.variables) {
+                allEnums.push(...importDirective.project.variables.enums);
+            }
+        }
+        return allEnums;
+    }
+
     get allVisibleGlobalVariables() {
         let allVariables = this.variables
             ? [...this.variables.globalVariables]
@@ -1924,7 +1935,7 @@ export class Project extends EezObject {
     }
 
     get allActions() {
-        let allActions = this.actions;
+        let allActions = [...this.actions];
         for (const importDirective of this.settings.general.imports) {
             if (importDirective.project) {
                 allActions.push(...importDirective.project.actions);
