@@ -422,8 +422,11 @@ export class WizardModel {
     }
 
     async fetchTemplateProjects() {
+        const giteaUrl = process.env.GITEA_URL;
+        const giteaTemplateTopic = process.env.GITEA_PROJECT_TEMPLATE_TOPIC;
+        if (!giteaUrl) return;
         const result = await fetch(
-            "https://envox.eu/gitea/api/v1/repos/search?q=eez-flow-template&topic=true"
+            `${giteaUrl}/api/v1/repos/search?q=${giteaTemplateTopic}&topic=true`
         );
         const data = await result.json();
         const templateProjects = data.data.map(
@@ -937,11 +940,12 @@ export class WizardModel {
             }
 
             if (this.templateProjectTypes.length > 0) {
+                const giteaUrl = process.env.GITEA_URL;
                 children.push({
                     id: "_templates",
                     label: (
                         <Count
-                            label="From envox.eu/gitea"
+                            label={`From ${giteaUrl}`}
                             count={this.templateProjectTypes.length}
                             attention={false}
                         ></Count>
@@ -2268,7 +2272,7 @@ const ProjectProperties = observer(
                                                 event =>
                                                     (wizardModel.lvglVersion =
                                                         event.target.value == "9.2.2" ||
-                                                        event.target.value == "9.3.0" || 
+                                                        event.target.value == "9.3.0" ||
                                                         event.target.value == "9.4.0"
                                                             ? event.target.value
                                                             : "8.4.0")

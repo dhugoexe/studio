@@ -1,4 +1,6 @@
 /// <reference path="./globals.d.ts"/>
+import * as dotenv from "dotenv";
+
 import "bootstrap";
 import { ipcRenderer } from "electron";
 import React from "react";
@@ -26,6 +28,9 @@ import "home/settings";
 import { extensionsCatalog } from "./extensions-manager/catalog";
 import { buildProject } from "home/build-project";
 import { layoutModels } from "eez-studio-ui/side-dock";
+
+
+dotenv.config();
 
 configure({ enforceActions: "observed", useProxies: "always" });
 
