@@ -196,6 +196,12 @@ export class OpenProjectsManager {
             this.openProjects = [...map.values()];
         });
 
+        // Final rebuild: now that all projects are loaded, collect extensions
+        // from every open project (main + imports) so that neither overrides
+        // the other. This corrects the case where an imported project with no
+        // extensions was deserialized last and cleared the maps.
+        this.projectStore.buildImportedExtensions(project);
+
         //this._dumpOpenProjects();
 
         return project;

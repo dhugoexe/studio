@@ -808,6 +808,26 @@ export interface IDashboardComponentContext {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+export interface IExtensionStructureField {
+    name: string;
+    type: ValueType;
+}
+
+export interface IExtensionStructureDefinition {
+    name: string;
+    fields: IExtensionStructureField[];
+}
+
+export interface IExtensionEnumMember {
+    name: string;
+    value: number;
+}
+
+export interface IExtensionEnumDefinition {
+    name: string;
+    members: IExtensionEnumMember[];
+}
+
 export interface IEezFlowEditor {
     registerActionComponent(definition: IActionComponentDefinition): void;
 
@@ -815,6 +835,10 @@ export interface IEezFlowEditor {
         name: string,
         objectVariableType: IObjectVariableType
     ): void;
+
+    registerStructureVariableType(structure: IExtensionStructureDefinition): void;
+
+    registerEnumVariableType(enumDef: IExtensionEnumDefinition): void;
 
     showGenericDialog(
         conf: GenericDialogConfiguration

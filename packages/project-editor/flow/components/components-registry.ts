@@ -140,7 +140,6 @@ export function getComponentGroupName(
 
     return groupName;
 }
-
 // Groups sort order:
 //  !1 -> "Common Widgets" and odther LVGL widget groups
 //  !2 -> "LVGL Actions"

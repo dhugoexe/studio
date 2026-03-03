@@ -1640,6 +1640,11 @@ export class ProjectVariables extends EezObject {
         for (const enumDef of systemEnums) {
             map.set(enumDef.name, enumDef);
         }
+        for (const [name, enumDef] of projectStore.importedEnumVariableTypes) {
+            if (!map.has(name)) {
+                map.set(name, enumDef);
+            }
+        }
         return map;
     }
 
@@ -1650,6 +1655,12 @@ export class ProjectVariables extends EezObject {
         }
         for (const structure of SYSTEM_STRUCTURES) {
             map.set(structure.name, structure);
+        }
+        const projectStore = ProjectEditor.getProjectStore(this);
+        for (const [name, structure] of projectStore.importedStructureVariableTypes) {
+            if (!map.has(name)) {
+                map.set(name, structure);
+            }
         }
         return map;
     }
