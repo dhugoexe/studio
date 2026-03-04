@@ -92,7 +92,7 @@ Extensions live in `build/<name>/` and are loaded at startup. Entry point must `
 Custom extension at `packages/roxer-actions/`:
 - `package.json` — `"eez-studio": { "node-module": true }` marks it as a native extension
 - `index.ts` — extension entry point, registers action components
-- `flow-components.ts` — imported by `project-editor-create.tsx` for global registration
+- `actions.ts` — imported by `project-editor-create.tsx` for global registration
 
 To add a new action: copy the template pattern in `index.ts`, write a `registerXxx(eezStudio)` function, call it in `eezFlowExtensionInit`.
 
