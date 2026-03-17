@@ -312,6 +312,11 @@ export interface IActionComponentDefinition {
     migrateProperties?: (component: IActionComponent) => void;
 
     execute?: (context: IDashboardComponentContext) => void;
+
+    // If true, the build generates an extern C prototype and a registerComponent()
+    // call. The user provides the implementation in their firmware project.
+    // Generated function: void eez_flow_ext_<sanitized_name>(FlowState*, unsigned)
+    isNative?: boolean;
 }
 
 interface IMessageFromWorker {

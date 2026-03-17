@@ -176,6 +176,8 @@ export class Assets {
         [componentType: number]: string;
     } = {};
 
+    nativeExtensionComponents: { componentType: number; className: string }[] = [];
+
     isUsingCrypyoSha256: boolean = false;
 
     lvglBuild: LVGLBuild;
@@ -1805,6 +1807,14 @@ export async function buildAssets(
             ) {
                 result.LVGL_ACTIONS_DECL =
                     await assets.lvglBuild.buildActionsDecl();
+            }
+
+            if (
+                !sectionNames ||
+                sectionNames.indexOf("LVGL_EXT_COMPONENT_DECL") !== -1
+            ) {
+                result.LVGL_EXT_COMPONENT_DECL =
+                    await assets.lvglBuild.buildExtComponentDecl();
             }
 
             if (

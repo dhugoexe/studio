@@ -4630,7 +4630,8 @@ export function createActionComponentClass(
             componentHeaderColor:
                 actionComponentDefinition.componentHeaderColor,
             componentPaletteGroupName,
-            execute: actionComponentDefinition.execute
+            execute: actionComponentDefinition.execute,
+            isNative: actionComponentDefinition.isNative
         });
 
         override makeEditable() {

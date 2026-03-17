@@ -2602,14 +2602,27 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
     executeLVGLApiComponent, 
     executeSetColorThemeComponent,  
 };
+#define MAX_EXT_COMPONENTS 64
+static struct { uint16_t type; ExecuteComponentFunctionType fn; }
+    g_extComponents[MAX_EXT_COMPONENTS];
+static uint8_t g_numExtComponents = 0;
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
-	if (componentType >= defs_v3::COMPONENT_TYPE_START_ACTION) {
+	if (componentType >= defs_v3::FIRST_DASHBOARD_ACTION_COMPONENT_TYPE) {
+        if (g_numExtComponents < MAX_EXT_COMPONENTS) {
+            g_extComponents[g_numExtComponents++] = {
+                (uint16_t)componentType, executeComponentFunction
+            };
+        }
+	} else if (componentType >= defs_v3::COMPONENT_TYPE_START_ACTION) {
 		g_executeComponentFunctions[componentType - defs_v3::COMPONENT_TYPE_START_ACTION] = executeComponentFunction;
 	}
 }
 bool hasExecFunc(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components[componentIndex];
 	if (component->type >= defs_v3::FIRST_DASHBOARD_ACTION_COMPONENT_TYPE) {
+        for (uint8_t i = 0; i < g_numExtComponents; i++) {
+            if (g_extComponents[i].type == component->type) return true;
+        }
         return false;
     } else if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
 		auto executeComponentFunction = g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION];
@@ -2620,6 +2633,15 @@ bool hasExecFunc(FlowState *flowState, unsigned componentIndex) {
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components[componentIndex];
 	if (component->type >= defs_v3::FIRST_DASHBOARD_ACTION_COMPONENT_TYPE) {
+        for (uint8_t i = 0; i < g_numExtComponents; i++) {
+            if (g_extComponents[i].type == component->type) {
+                g_extComponents[i].fn(flowState, componentIndex);
+                return;
+            }
+        }
+		char errorMessage[100];
+		snprintf(errorMessage, sizeof(errorMessage), "Unknown ext component type=%d\n", component->type);
+		throwError(flowState, componentIndex, errorMessage);
         return;
     } else if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
 		auto executeComponentFunction = g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION];
@@ -6800,6 +6822,12 @@ void replacePageHook(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t
 }
 extern "C" void flowOnPageLoaded(unsigned pageIndex) {
     eez::flow::getPageFlowState(eez::g_mainAssets, pageIndex);
+}
+extern "C" void eez_flow_register_ext_component(unsigned componentType, void (*fn)(void *flowState, unsigned componentIndex)) {
+    eez::flow::registerComponent(
+        (eez::flow::defs_v3::ComponentTypes)componentType,
+        (eez::flow::ExecuteComponentFunctionType)fn
+    );
 }
 extern "C" void flowPropagateValue(void *flowState, unsigned componentIndex, unsigned outputIndex) {
     eez::flow::propagateValue((eez::flow::FlowState *)flowState, componentIndex, outputIndex);
