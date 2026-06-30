@@ -835,31 +835,45 @@ const SelectItemDialog = observer(
 
                 const enumTypes = [
                     ...this.context.project.allEnums,
-                    ...getSystemEnums(this.context)
+                    ...getSystemEnums(this.context),
+                    ...this.context.importedEnumVariableTypes.values()
                 ];
 
                 if (enumTypes.length) {
                     children.push({
                         id: "enumerations",
                         label: "Enumerations",
-                        children: enumTypes.map(enumeration => ({
-                            id: enumeration.name,
-                            label: enumeration.name,
-                            children: enumeration.members.map(member => {
-                                const data = `${enumeration.name}.${member.name}`;
-                                return {
-                                    id: member.name,
-                                    label: member.name,
-                                    children: [],
-                                    selected: this.selection == member.name,
-                                    expanded: false,
-                                    data
-                                };
-                            }),
-                            selected: false,
-                            expanded: false,
-                            data: undefined
-                        })),
+                        children: enumTypes.map(enumeration => {
+                            // Extension enums have names like "extName/enumName";
+                            // strip the prefix so the expression is parseable.
+                            const slashIndex =
+                                enumeration.name.indexOf("/");
+                            const shortName =
+                                slashIndex !== -1
+                                    ? enumeration.name.substring(
+                                          slashIndex + 1
+                                      )
+                                    : enumeration.name;
+                            return {
+                                id: enumeration.name,
+                                label: shortName,
+                                children: enumeration.members.map(member => {
+                                    const data = `${shortName}.${member.name}`;
+                                    return {
+                                        id: member.name,
+                                        label: member.name,
+                                        children: [],
+                                        selected:
+                                            this.selection == member.name,
+                                        expanded: false,
+                                        data
+                                    };
+                                }),
+                                selected: false,
+                                expanded: false,
+                                data: undefined
+                            };
+                        }),
                         selected: false,
                         expanded: true
                     });

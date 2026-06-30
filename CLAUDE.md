@@ -96,9 +96,9 @@ Custom extension at `packages/roxer-actions/`:
 
 To add a new action: copy the template pattern in `index.ts`, write a `registerXxx(eezStudio)` function, call it in `eezFlowExtensionInit`.
 
-To activate in a project: `Settings > General > Extensions > Add > "roxer-actions"` then reload the project.
+``To activate in a project: `Settings > General > Extensions > Add > "roxer-actions"` then reload the project.
 
-## Variable / Type System Notes
+## Variable / Type System Notes``
 
 - `packages/project-editor/features/variable/value-type.tsx` — fork patches: SYSTEM_STRUCTURES visible in LVGL context, `uint8`/`int8`/etc. included in `isValueTypeOf`.
 

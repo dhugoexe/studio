@@ -1644,6 +1644,15 @@ export class ProjectVariables extends EezObject {
             if (!map.has(name)) {
                 map.set(name, enumDef);
             }
+            // Also index by short name (without extension prefix) so
+            // expressions like "cycle_command.START_CYCLE" can be resolved.
+            const slashIndex = name.indexOf("/");
+            if (slashIndex !== -1) {
+                const shortName = name.substring(slashIndex + 1);
+                if (!map.has(shortName)) {
+                    map.set(shortName, enumDef);
+                }
+            }
         }
         return map;
     }
